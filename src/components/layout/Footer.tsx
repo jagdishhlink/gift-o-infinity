@@ -1,7 +1,7 @@
 "use client";
 
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, Twitter } from "lucide-react";
-import { businessData } from "@/data/site-data";
+import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, Twitter, ArrowUpRight, Heart } from "lucide-react";
+import { businessData, siteConfig } from "@/data/site-data";
 
 const socialIcons: Record<string, any> = {
   instagram: Instagram,
@@ -10,129 +10,412 @@ const socialIcons: Record<string, any> = {
   twitter: Twitter,
 };
 
-export function Footer() {
-  const year = new Date().getFullYear();
+function getSocials() {
   const socials = businessData.socials || {};
+  return Object.entries(socials).filter(([platform, url]) => socialIcons[platform] && url);
+}
+
+export function Footer() {
+  const layout = siteConfig.layout;
+
+  if (["minimal", "swiss-typography", "apple-inspired", "elegant"].includes(layout)) return <FooterMinimal />;
+  if (["brutalist", "high-contrast", "monochrome", "retro"].includes(layout)) return <FooterBold />;
+  if (["dark-premium", "futuristic", "glassmorphism", "immersive-fullscreen"].includes(layout)) return <FooterDark />;
+  if (["magazine-style", "editorial", "asymmetrical"].includes(layout)) return <FooterEditorial />;
+  return <FooterDefault />;
+}
+
+// ─── Default: adaptive grid (4-col with socials, 3-col without) ───
+function FooterDefault() {
+  const year = new Date().getFullYear();
+  const socials = getSocials();
+  const hasSocials = socials.length > 0;
 
   return (
-    <footer className="bg-card border-t border-border">
-      <div className="container-custom px-4 md:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {/* Brand */}
+    <footer className="border-t border-border bg-card/40">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-16">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${hasSocials ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-10 md:gap-8`}>
           <div className="space-y-4">
             {businessData.logo ? (
-              <img src={businessData.logo} alt={businessData.name} className="h-10 w-auto" />
+              <img src={businessData.logo} alt={businessData.name} className="h-9 w-auto" />
             ) : (
-              <h3 className="text-2xl font-heading font-bold gradient-text">
-                {businessData.name}
-              </h3>
+              <h3 className="text-xl font-heading font-bold">{businessData.name}</h3>
             )}
-            <p className="text-foreground/60 text-sm leading-relaxed">
+            <p className="text-foreground/50 text-sm leading-relaxed max-w-xs">
               {businessData.description || `${businessData.category} — Trusted by our community.`}
             </p>
+            {!hasSocials && <RatingBlock />}
           </div>
 
-          {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="font-heading font-semibold text-lg">Quick Links</h4>
-            <nav className="space-y-2">
+            <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-foreground/70">Quick Links</h4>
+            <nav className="space-y-2.5">
               {["About", "Services", "Gallery", "Testimonials", "Contact"].map((link) => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
-                  className="block text-sm text-foreground/60 hover:text-primary transition-colors"
-                >
+                <a key={link} href={`#${link.toLowerCase()}`} className="block text-sm text-foreground/50 hover:text-primary transition-colors">
                   {link}
                 </a>
               ))}
             </nav>
           </div>
 
-          {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="font-heading font-semibold text-lg">Contact</h4>
-            <div className="space-y-3">
-              {businessData.address && (
-                <div className="flex items-start gap-3 text-sm text-foreground/60">
-                  <MapPin size={16} className="mt-0.5 flex-shrink-0 text-primary" />
-                  <span>{businessData.address}</span>
-                </div>
-              )}
-              {businessData.phone && (
-                <a href={`tel:${businessData.phone}`} className="flex items-center gap-3 text-sm text-foreground/60 hover:text-primary transition-colors">
-                  <Phone size={16} className="flex-shrink-0 text-primary" />
-                  <span>{businessData.phone}</span>
-                </a>
-              )}
-              {businessData.email && (
-                <a href={`mailto:${businessData.email}`} className="flex items-center gap-3 text-sm text-foreground/60 hover:text-primary transition-colors">
-                  <Mail size={16} className="flex-shrink-0 text-primary" />
-                  <span>{businessData.email}</span>
-                </a>
-              )}
-              {businessData.openingHours && (
-                <div className="flex items-start gap-3 text-sm text-foreground/60">
-                  <Clock size={16} className="mt-0.5 flex-shrink-0 text-primary" />
-                  <span>{businessData.openingHours}</span>
-                </div>
-              )}
-            </div>
+            <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-foreground/70">Contact</h4>
+            <ContactInfo />
           </div>
 
-          {/* Social + Map */}
-          <div className="space-y-4">
-            {Object.entries(socials).some(([platform, url]) => socialIcons[platform] && url) && (
-              <>
-                <h4 className="font-heading font-semibold text-lg">Follow Us</h4>
-                <div className="flex gap-3">
-                  {Object.entries(socials).map(([platform, url]) => {
+          {hasSocials && (
+            <div className="space-y-5">
+              <SocialBlock socials={socials} />
+              <RatingBlock />
+            </div>
+          )}
+        </div>
+
+        <BottomBar year={year} />
+      </div>
+    </footer>
+  );
+}
+
+// ─── Minimal: centered single column ───
+function FooterMinimal() {
+  const year = new Date().getFullYear();
+  const socials = getSocials();
+  const hasSocials = socials.length > 0;
+
+  return (
+    <footer className="border-t border-border">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-14 md:py-20 text-center">
+        <div className="mb-8">
+          {businessData.logo ? (
+            <img src={businessData.logo} alt={businessData.name} className="h-8 w-auto mx-auto" />
+          ) : (
+            <h3 className="text-lg font-heading font-bold">{businessData.name}</h3>
+          )}
+        </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8">
+          {["About", "Services", "Gallery", "Testimonials", "Contact"].map((link) => (
+            <a key={link} href={`#${link.toLowerCase()}`} className="text-sm text-foreground/50 hover:text-primary transition-colors">
+              {link}
+            </a>
+          ))}
+        </nav>
+
+        {hasSocials && (
+          <div className="flex items-center justify-center gap-3 mb-8">
+            {socials.map(([platform, url]) => {
+              const Icon = socialIcons[platform];
+              return (
+                <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-foreground/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all" aria-label={platform}>
+                  <Icon size={15} />
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-foreground/40">
+          {businessData.phone && (
+            <a href={`tel:${businessData.phone}`} className="hover:text-primary transition-colors">{businessData.phone}</a>
+          )}
+          {businessData.phone && businessData.email && <span className="hidden sm:block">·</span>}
+          {businessData.email && (
+            <a href={`mailto:${businessData.email}`} className="hover:text-primary transition-colors">{businessData.email}</a>
+          )}
+        </div>
+
+        <div className={`${hasSocials ? "mt-8" : "mt-6"} pt-8 border-t border-border/50`}>
+          <p className="text-xs text-foreground/35">&copy; {year} {businessData.name}. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Bold: large type, stacked ───
+function FooterBold() {
+  const year = new Date().getFullYear();
+  const socials = getSocials();
+  const hasSocials = socials.length > 0;
+
+  return (
+    <footer className="border-t-2 border-foreground/10 bg-card/30">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-20">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
+          <div>
+            <h3 className="text-3xl md:text-4xl font-heading font-bold mb-4">{businessData.name}</h3>
+            <p className="text-foreground/50 text-base leading-relaxed max-w-md mb-6">
+              {businessData.description || `Premium ${businessData.category} — serving our community with excellence.`}
+            </p>
+            {businessData.address && (
+              <p className="text-foreground/40 text-sm">{businessData.address}</p>
+            )}
+            {!hasSocials && <div className="mt-5"><RatingBlock /></div>}
+          </div>
+
+          <div className={hasSocials ? "grid sm:grid-cols-2 gap-8" : ""}>
+            <div className="space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-foreground/40">Navigate</h4>
+              <nav className="space-y-2">
+                {["About", "Services", "Gallery", "Contact"].map((link) => (
+                  <a key={link} href={`#${link.toLowerCase()}`} className="block text-base font-medium text-foreground/70 hover:text-primary transition-colors">
+                    {link}
+                  </a>
+                ))}
+              </nav>
+            </div>
+
+            <div className="space-y-4 mt-8 sm:mt-0">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-foreground/40">Reach Us</h4>
+              <div className="space-y-2.5">
+                {businessData.phone && (
+                  <a href={`tel:${businessData.phone}`} className="block text-base font-medium text-foreground/70 hover:text-primary transition-colors">
+                    {businessData.phone}
+                  </a>
+                )}
+                {businessData.email && (
+                  <a href={`mailto:${businessData.email}`} className="block text-base font-medium text-foreground/70 hover:text-primary transition-colors">
+                    {businessData.email}
+                  </a>
+                )}
+              </div>
+              {hasSocials && (
+                <div className="flex gap-2 pt-2">
+                  {socials.map(([platform, url]) => {
                     const Icon = socialIcons[platform];
-                    if (!Icon || !url) return null;
                     return (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all"
-                        aria-label={platform}
-                      >
-                        <Icon size={18} />
+                      <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-foreground/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all" aria-label={platform}>
+                        <Icon size={15} />
                       </a>
                     );
                   })}
                 </div>
-              </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-14 pt-7 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-foreground/35">&copy; {year} {businessData.name}</p>
+          <MapLink />
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Dark: premium gradient background ───
+function FooterDark() {
+  const year = new Date().getFullYear();
+  const socials = getSocials();
+  const hasSocials = socials.length > 0;
+
+  return (
+    <footer className="relative overflow-hidden border-t border-border">
+      <div className="absolute inset-0 bg-gradient-to-b from-background to-card/80 pointer-events-none" />
+      <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-20">
+        <div className="text-center mb-12">
+          {businessData.logo ? (
+            <img src={businessData.logo} alt={businessData.name} className="h-10 w-auto mx-auto mb-4" />
+          ) : (
+            <h3 className="text-2xl font-heading font-bold mb-4 gradient-text">{businessData.name}</h3>
+          )}
+          <p className="text-foreground/45 text-sm max-w-sm mx-auto">
+            {businessData.description || businessData.category}
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-12">
+          {businessData.phone && (
+            <a href={`tel:${businessData.phone}`} className="text-center p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/20 transition-all">
+              <Phone size={16} className="mx-auto mb-2 text-primary" />
+              <span className="text-xs text-foreground/60 block">{businessData.phone}</span>
+            </a>
+          )}
+          {businessData.email && (
+            <a href={`mailto:${businessData.email}`} className="text-center p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/20 transition-all">
+              <Mail size={16} className="mx-auto mb-2 text-primary" />
+              <span className="text-xs text-foreground/60 block">{businessData.email}</span>
+            </a>
+          )}
+          {businessData.address && (
+            <div className="text-center p-4 rounded-xl bg-card/50 border border-border/50">
+              <MapPin size={16} className="mx-auto mb-2 text-primary" />
+              <span className="text-xs text-foreground/60 block truncate">{businessData.address.split(",")[0]}</span>
+            </div>
+          )}
+        </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-8">
+          {["About", "Services", "Gallery", "Testimonials", "Contact"].map((link) => (
+            <a key={link} href={`#${link.toLowerCase()}`} className="text-xs uppercase tracking-wider text-foreground/40 hover:text-primary transition-colors">
+              {link}
+            </a>
+          ))}
+        </nav>
+
+        {hasSocials && (
+          <div className="flex items-center justify-center gap-2.5 mb-10">
+            {socials.map(([platform, url]) => {
+              const Icon = socialIcons[platform];
+              return (
+                <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full border border-border/50 flex items-center justify-center text-foreground/40 hover:text-primary hover:border-primary/30 transition-all" aria-label={platform}>
+                  <Icon size={14} />
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+        <div className={`text-center pt-8 border-t border-border/40 ${!hasSocials ? "mt-4" : ""}`}>
+          <p className="text-[11px] text-foreground/30">&copy; {year} {businessData.name}. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Editorial: asymmetric two-column ───
+function FooterEditorial() {
+  const year = new Date().getFullYear();
+  const socials = getSocials();
+  const hasSocials = socials.length > 0;
+
+  return (
+    <footer className="border-t border-border">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-16">
+        <div className={`grid lg:grid-cols-12 gap-10 lg:gap-6`}>
+          <div className={`${hasSocials ? "lg:col-span-5" : "lg:col-span-6"} space-y-5`}>
+            {businessData.logo ? (
+              <img src={businessData.logo} alt={businessData.name} className="h-9 w-auto" />
+            ) : (
+              <h3 className="text-xl font-heading font-bold">{businessData.name}</h3>
             )}
-            {businessData.rating && (
-              <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-primary">{businessData.rating}</span>
-                  <div>
-                    <div className="text-yellow-500 text-sm">{"★".repeat(Math.round(parseFloat(businessData.rating)))}</div>
-                    <span className="text-xs text-foreground/50">{businessData.reviewsCount} reviews</span>
-                  </div>
-                </div>
+            <p className="text-foreground/50 text-sm leading-relaxed max-w-sm">
+              {businessData.description || `${businessData.category} — Trusted by our community.`}
+            </p>
+            <RatingBlock />
+          </div>
+
+          <div className={`${hasSocials ? "lg:col-span-3 lg:col-start-7" : "lg:col-span-3 lg:col-start-8"}`}>
+            <h4 className="font-heading font-semibold text-sm mb-4 text-foreground/70">Pages</h4>
+            <nav className="grid grid-cols-2 gap-x-6 gap-y-2">
+              {["About", "Services", "Gallery", "Testimonials", "Pricing", "Contact"].map((link) => (
+                <a key={link} href={`#${link.toLowerCase()}`} className="text-sm text-foreground/45 hover:text-primary transition-colors">
+                  {link}
+                </a>
+              ))}
+            </nav>
+          </div>
+
+          <div className={`${hasSocials ? "lg:col-span-4" : "lg:col-span-3"}`}>
+            <h4 className="font-heading font-semibold text-sm mb-4 text-foreground/70">Get in Touch</h4>
+            <ContactInfo />
+            {hasSocials && (
+              <div className="flex gap-2 mt-5">
+                {socials.map(([platform, url]) => {
+                  const Icon = socialIcons[platform];
+                  return (
+                    <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all" aria-label={platform}>
+                      <Icon size={14} />
+                    </a>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-foreground/50">
-            © {year} {businessData.name}. All rights reserved.
-          </p>
-          <a
-            href={businessData.mapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline"
-          >
-            View on Google Maps →
-          </a>
+        <div className="mt-12 pt-7 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-foreground/35">&copy; {year} {businessData.name}. All rights reserved.</p>
+          <MapLink />
         </div>
       </div>
     </footer>
+  );
+}
+
+// ─── Shared Sub-components ───
+
+function ContactInfo() {
+  return (
+    <div className="space-y-2.5">
+      {businessData.address && (
+        <div className="flex items-start gap-2.5 text-sm text-foreground/50">
+          <MapPin size={13} className="mt-0.5 flex-shrink-0 text-primary/60" />
+          <span className="leading-relaxed">{businessData.address}</span>
+        </div>
+      )}
+      {businessData.phone && (
+        <a href={`tel:${businessData.phone}`} className="flex items-center gap-2.5 text-sm text-foreground/50 hover:text-primary transition-colors">
+          <Phone size={13} className="flex-shrink-0 text-primary/60" />
+          <span>{businessData.phone}</span>
+        </a>
+      )}
+      {businessData.email && (
+        <a href={`mailto:${businessData.email}`} className="flex items-center gap-2.5 text-sm text-foreground/50 hover:text-primary transition-colors">
+          <Mail size={13} className="flex-shrink-0 text-primary/60" />
+          <span>{businessData.email}</span>
+        </a>
+      )}
+      {businessData.openingHours && (
+        <div className="flex items-start gap-2.5 text-sm text-foreground/50">
+          <Clock size={13} className="mt-0.5 flex-shrink-0 text-primary/60" />
+          <span className="leading-relaxed">{businessData.openingHours}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SocialBlock({ socials }: { socials: [string, unknown][] }) {
+  if (socials.length === 0) return null;
+  return (
+    <>
+      <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-foreground/70">Follow Us</h4>
+      <div className="flex gap-2.5">
+        {socials.map(([platform, url]) => {
+          const Icon = socialIcons[platform];
+          return (
+            <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-foreground/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all" aria-label={platform}>
+              <Icon size={15} />
+            </a>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function RatingBlock() {
+  if (!businessData.rating) return null;
+  return (
+    <div className="inline-flex items-center gap-2.5 p-3 rounded-xl bg-card/80 border border-border">
+      <span className="text-xl font-bold text-primary">{businessData.rating}</span>
+      <div>
+        <div className="text-yellow-500 text-xs leading-none">{"★".repeat(Math.round(parseFloat(businessData.rating)))}</div>
+        <span className="text-[11px] text-foreground/40 mt-0.5 block">{businessData.reviewsCount} reviews</span>
+      </div>
+    </div>
+  );
+}
+
+function BottomBar({ year }: { year: number }) {
+  return (
+    <div className="mt-12 pt-7 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p className="text-xs text-foreground/35">&copy; {year} {businessData.name}. All rights reserved.</p>
+      <MapLink />
+    </div>
+  );
+}
+
+function MapLink() {
+  if (!businessData.mapUrl) return null;
+  return (
+    <a href={businessData.mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-foreground/35 hover:text-primary transition-colors">
+      View on Google Maps
+      <ArrowUpRight size={10} />
+    </a>
   );
 }

@@ -1,33 +1,51 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import { aiContent, siteConfig } from "@/data/site-data";
 
 export function ServicesSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
   const layout = siteConfig.layout;
   const services = aiContent.services || [];
 
   if (services.length === 0) return null;
 
-  // Map all 15 layout styles to 4 service variants
-  if (["bento-grid", "asymmetrical-modern", "editorial-magazine", "dark-futuristic", "cyberpunk", "glassmorphism"].includes(layout)) return <ServicesCards services={services} />;
-  if (["minimal-luxury", "scandinavian", "apple-minimal", "organic-fluid"].includes(layout)) return <ServicesList services={services} />;
-  if (["neo-brutalism", "retro-vintage", "interactive-3d"].includes(layout)) return <ServicesNumbered services={services} />;
-  return <ServicesGrid services={services} />;
+  if (["bento-grid", "asymmetrical", "editorial", "futuristic", "glassmorphism", "dark-premium"].includes(layout)) return <ServicesCards services={services} isInView={isInView} sectionRef={ref} />;
+  if (["minimal", "swiss-typography", "apple-inspired", "organic-shapes", "elegant"].includes(layout)) return <ServicesList services={services} isInView={isInView} sectionRef={ref} />;
+  if (["brutalist", "retro", "high-contrast", "monochrome"].includes(layout)) return <ServicesNumbered services={services} isInView={isInView} sectionRef={ref} />;
+  return <ServicesGrid services={services} isInView={isInView} sectionRef={ref} />;
 }
 
-function ServicesGrid({ services }: { services: any[] }) {
+interface ServiceProps {
+  services: any[];
+  isInView: boolean;
+  sectionRef: React.RefObject<any>;
+}
+
+function ServicesGrid({ services, isInView, sectionRef }: ServiceProps) {
   return (
-    <section id="services" className="section-padding">
+    <section id="services" className="section-padding" ref={sectionRef}>
       <div className="container-custom">
-        <SectionHeader title="Our Services" subtitle="What We Offer" />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SectionHeader isInView={isInView} />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
           {services.map((s: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="p-8 rounded-2xl bg-card border border-border hover-lift group">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">{s.icon}</div>
-              <h3 className="font-heading text-xl font-bold mb-3">{s.title}</h3>
-              <p className="text-foreground/60 text-sm leading-relaxed">{s.description}</p>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
+              className="group relative p-7 md:p-8 rounded-2xl bg-card border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+            >
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl mb-5 group-hover:scale-110 group-hover:bg-primary/15 transition-all duration-300">
+                  {s.icon}
+                </div>
+                <h3 className="font-heading text-lg font-bold mb-2.5">{s.title}</h3>
+                <p className="text-foreground/60 text-sm leading-relaxed">{s.description}</p>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -36,19 +54,26 @@ function ServicesGrid({ services }: { services: any[] }) {
   );
 }
 
-function ServicesCards({ services }: { services: any[] }) {
+function ServicesCards({ services, isInView, sectionRef }: ServiceProps) {
   return (
-    <section id="services" className="section-padding">
+    <section id="services" className="section-padding" ref={sectionRef}>
       <div className="container-custom">
-        <SectionHeader title="Our Services" subtitle="What We Offer" />
-        <div className="grid sm:grid-cols-2 gap-5">
+        <SectionHeader isInView={isInView} />
+        <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
           {services.map((s: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="p-6 rounded-xl bg-card border border-border flex items-start gap-5 hover:border-primary/30 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl shrink-0">{s.icon}</div>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: i % 2 === 0 ? -16 : 16 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
+              className="group p-6 rounded-2xl bg-card border border-border flex items-start gap-5 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
+            >
+              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-xl shrink-0 group-hover:bg-primary/15 transition-colors">
+                {s.icon}
+              </div>
               <div>
-                <h3 className="font-semibold text-lg mb-1">{s.title}</h3>
-                <p className="text-foreground/50 text-sm">{s.description}</p>
+                <h3 className="font-heading font-bold text-base mb-1.5">{s.title}</h3>
+                <p className="text-foreground/55 text-sm leading-relaxed">{s.description}</p>
               </div>
             </motion.div>
           ))}
@@ -58,22 +83,31 @@ function ServicesCards({ services }: { services: any[] }) {
   );
 }
 
-function ServicesList({ services }: { services: any[] }) {
+function ServicesList({ services, isInView, sectionRef }: ServiceProps) {
   return (
-    <section id="services" className="section-padding">
-      <div className="container-custom max-w-3xl">
-        <div className="mb-12">
-          <p className="text-primary font-mono text-sm mb-2 tracking-wider uppercase">Services</p>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold">What We Offer</h2>
-        </div>
-        <div className="divide-y divide-border">
+    <section id="services" className="section-padding" ref={sectionRef}>
+      <div className="container-custom max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          className="mb-14"
+        >
+          <p className="text-primary text-sm font-medium mb-3 tracking-wider uppercase">Services</p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">What We Offer</h2>
+        </motion.div>
+        <div className="divide-y divide-border/60">
           {services.map((s: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-              className="py-8 flex items-center gap-6 group hover:pl-4 transition-all">
-              <span className="text-3xl">{s.icon}</span>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ delay: i * 0.06 }}
+              className="group py-7 md:py-8 flex items-start gap-5 md:gap-6 hover:pl-2 transition-all duration-300"
+            >
+              <span className="text-2xl mt-1 shrink-0 group-hover:scale-110 transition-transform">{s.icon}</span>
               <div className="flex-1">
-                <h3 className="font-heading text-lg font-bold">{s.title}</h3>
-                <p className="text-foreground/40 text-sm mt-1">{s.description}</p>
+                <h3 className="font-heading text-lg font-bold mb-1">{s.title}</h3>
+                <p className="text-foreground/50 text-sm leading-relaxed">{s.description}</p>
               </div>
             </motion.div>
           ))}
@@ -83,24 +117,34 @@ function ServicesList({ services }: { services: any[] }) {
   );
 }
 
-function ServicesNumbered({ services }: { services: any[] }) {
+function ServicesNumbered({ services, isInView, sectionRef }: ServiceProps) {
   return (
-    <section id="services" className="section-padding">
+    <section id="services" className="section-padding" ref={sectionRef}>
       <div className="container-custom">
-        <div className="flex items-center gap-4 mb-12">
-          <div className="w-3 h-3 bg-primary rounded-full" />
-          <span className="text-foreground/60 uppercase tracking-widest text-xs">Services</span>
-        </div>
-        <div className="grid md:grid-cols-2 gap-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          className="flex items-center gap-4 mb-14"
+        >
+          <div className="w-2.5 h-2.5 bg-primary rounded-full" />
+          <span className="text-foreground/60 uppercase tracking-widest text-xs font-medium">Our Services</span>
+          <div className="flex-1 h-px bg-border" />
+        </motion.div>
+        <div className="grid md:grid-cols-2 gap-8 md:gap-10">
           {services.map((s: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="flex gap-6 group">
-              <div className="text-4xl font-heading font-bold text-primary/30 group-hover:text-primary transition-colors">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.08 }}
+              className="flex gap-5 md:gap-6 group"
+            >
+              <div className="text-3xl font-heading font-bold text-primary/20 group-hover:text-primary/60 transition-colors duration-300 tabular-nums">
                 {String(i + 1).padStart(2, "0")}
               </div>
-              <div className="border-l border-border pl-6">
-                <h3 className="font-heading text-xl font-bold mb-2">{s.title}</h3>
-                <p className="text-foreground/50 text-sm">{s.description}</p>
+              <div className="border-l border-border/60 pl-5 md:pl-6 group-hover:border-primary/30 transition-colors">
+                <h3 className="font-heading text-lg font-bold mb-2">{s.title}</h3>
+                <p className="text-foreground/50 text-sm leading-relaxed">{s.description}</p>
               </div>
             </motion.div>
           ))}
@@ -110,11 +154,18 @@ function ServicesNumbered({ services }: { services: any[] }) {
   );
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+function SectionHeader({ isInView }: { isInView: boolean }) {
   return (
-    <div className="text-center mb-16">
-      <span className="inline-block px-4 py-1.5 rounded-full bg-card border border-border text-xs font-semibold uppercase tracking-widest text-primary mb-4">{subtitle}</span>
-      <h2 className="text-3xl md:text-4xl font-heading font-bold">{title}</h2>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      className="text-center mb-14 md:mb-16"
+    >
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-5">
+        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+        <span className="text-xs font-medium text-primary uppercase tracking-wider">Services</span>
+      </div>
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">What We Offer</h2>
+    </motion.div>
   );
 }

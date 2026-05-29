@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function PricingSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   const pricing = (aiContent as any).pricing;
   if (!pricing || !pricing.packages) return null;
@@ -20,60 +20,63 @@ export function PricingSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-16"
+          className="text-center mb-14 md:mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             <span className="text-xs font-medium text-primary uppercase tracking-wider">Pricing</span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">
             Our Packages
           </h2>
           {pricing.description && (
-            <p className="text-foreground/60 max-w-xl mx-auto">{pricing.description}</p>
+            <p className="text-foreground/55 max-w-md mx-auto mt-4">{pricing.description}</p>
           )}
         </motion.div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
           {pricing.packages.map((pkg: any, i: number) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.15 * i }}
+              transition={{ delay: 0.1 + i * 0.1, duration: 0.5 }}
               className={cn(
-                "relative p-6 md:p-8 rounded-2xl border transition-all hover-lift",
+                "relative p-6 md:p-7 rounded-2xl border transition-all duration-300",
                 pkg.popular
-                  ? "bg-primary/5 border-primary shadow-xl shadow-primary/10"
-                  : "bg-background border-border hover:border-primary/30"
+                  ? "bg-primary/[0.03] border-primary/30 shadow-lg shadow-primary/5 ring-1 ring-primary/10"
+                  : "bg-card border-border hover:border-primary/20"
               )}
             >
               {pkg.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-xs font-bold rounded-full">
-                  Most Popular
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-primary text-white text-[11px] font-semibold rounded-full tracking-wide uppercase">
+                  Popular
                 </div>
               )}
 
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-heading font-bold mb-2">{pkg.name}</h3>
+              <div className="mb-6">
+                <h3 className="text-lg font-heading font-bold mb-1.5">{pkg.name}</h3>
                 {pkg.description && (
-                  <p className="text-sm text-foreground/60 mb-4">{pkg.description}</p>
+                  <p className="text-sm text-foreground/50">{pkg.description}</p>
                 )}
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-bold gradient-text">{pkg.price}</span>
-                  {pkg.period && (
-                    <span className="text-sm text-foreground/50">/{pkg.period}</span>
-                  )}
-                </div>
+              </div>
+
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-3xl md:text-4xl font-bold">{pkg.price}</span>
+                {pkg.period && (
+                  <span className="text-sm text-foreground/45">/{pkg.period}</span>
+                )}
               </div>
 
               {/* Features */}
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2.5 mb-7">
                 {(pkg.features || []).map((feature: string, j: number) => (
-                  <li key={j} className="flex items-start gap-3 text-sm">
-                    <Check size={16} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-foreground/70">{feature}</span>
+                  <li key={j} className="flex items-start gap-2.5 text-sm">
+                    <div className="w-4.5 h-4.5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={11} className="text-primary" />
+                    </div>
+                    <span className="text-foreground/65">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -82,10 +85,10 @@ export function PricingSection() {
               <a
                 href="#contact"
                 className={cn(
-                  "block w-full text-center py-3 rounded-xl font-semibold transition-all",
+                  "block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200",
                   pkg.popular
-                    ? "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/25"
-                    : "bg-card border border-border hover:border-primary hover:text-primary"
+                    ? "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/15 hover:shadow-lg"
+                    : "bg-background border border-border hover:border-primary/30 hover:text-primary"
                 )}
               >
                 {pkg.cta || "Get Started"}
