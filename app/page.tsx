@@ -14,8 +14,8 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { BookingSection } from "@/components/sections/BookingSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { CTASection } from "@/components/sections/CTASection";
-import { StickyMobileCTA } from "@/components/layout/StickyMobileCTA";
 
+// Map section names to components
 const SECTION_MAP: Record<string, React.ComponentType> = {
   about: AboutSection,
   services: ServicesSection,
@@ -28,28 +28,27 @@ const SECTION_MAP: Record<string, React.ComponentType> = {
 };
 
 export default function HomePage() {
+  // Render sections in the EXACT order from siteConfig (randomized per business)
   const sections = siteConfig.sections;
 
   return (
-    <>
+    <main className={`min-h-screen bg-background overflow-hidden ${(siteConfig as any).darkMode ? 'dark' : ''}`}>
       <Navbar />
-      <main className="min-h-screen bg-background overflow-x-hidden">
-        <HeroSection />
+      <HeroSection />
 
-        {sections.map((sectionName: string) => {
-          const Component = SECTION_MAP[sectionName];
-          if (!Component) return null;
-          if (sectionName === "pricing" && !(aiContent as any).pricing) return null;
-          if (sectionName === "faq" && !(aiContent as any).faq) return null;
-          if (sectionName === "booking" && !(aiContent as any).booking) return null;
-          return <Component key={sectionName} />;
-        })}
+      {sections.map((sectionName: string) => {
+        const Component = SECTION_MAP[sectionName];
+        if (!Component) return null;
+        // Skip pricing/faq/booking if no data
+        if (sectionName === "pricing" && !(aiContent as any).pricing) return null;
+        if (sectionName === "faq" && !(aiContent as any).faq) return null;
+        if (sectionName === "booking" && !(aiContent as any).booking) return null;
+        return <Component key={sectionName} />;
+      })}
 
-        <CTASection />
-      </main>
+      <CTASection />
       <Footer />
       <WhatsAppWidget />
-      <StickyMobileCTA />
-    </>
+    </main>
   );
 }

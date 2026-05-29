@@ -1,127 +1,373 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Star, ArrowRight, Phone, MapPin, ChevronDown } from "lucide-react";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { Star, ArrowDown, Phone, MapPin, Sparkles } from "lucide-react";
 import { businessData, aiContent, siteConfig } from "@/data/site-data";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function HeroSection() {
+  const heroVariant = (siteConfig as any).heroVariant || "minimal-centered";
   const layout = siteConfig.layout;
-  const variant = (siteConfig as any).heroVariant || "centered-typography";
 
-  if (["split-screen", "left-aligned-content", "floating-cards"].includes(variant)) return <HeroAsymmetric />;
-  if (["large-typography-only", "centered-typography", "animated-statistics"].includes(variant)) return <HeroEditorial />;
-  return <HeroImmersive />;
+  if (heroVariant === "split-screen" || heroVariant === "left-aligned-content" || heroVariant === "floating-cards") return <HeroSplit />;
+  if (heroVariant === "large-typography-only" || heroVariant === "centered-typography") return <HeroTypography />;
+  if (heroVariant === "animated-statistics" || heroVariant === "before-after-showcase") return <HeroBold />;
+  if (heroVariant === "diagonal-layout" || heroVariant === "masonry-layout") return <HeroDiagonal />;
+  if (heroVariant === "carousel-hero" || heroVariant === "image-collage") return <HeroParticles />;
+  if (heroVariant === "fullscreen-image") return <HeroCinematic />;
+
+  if (["split", "bento-grid", "asymmetrical", "editorial"].includes(layout)) return <HeroSplit />;
+  if (["minimal", "swiss-typography", "apple-inspired"].includes(layout)) return <HeroTypography />;
+  if (["brutalist", "high-contrast", "retro"].includes(layout)) return <HeroBold />;
+  if (["dark-premium", "futuristic", "glassmorphism"].includes(layout)) return <HeroCinematic />;
+
+  return <HeroDefault />;
 }
 
-function HeroAsymmetric() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 100]);
+// ─── Animated counter hook ───
+function useAnimatedCounter(target: number, duration = 2) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, Math.round);
+  const [display, setDisplay] = useState(0);
 
+  useEffect(() => {
+    const controls = animate(count, target, { duration });
+    const unsubscribe = rounded.on("change", (v) => setDisplay(v));
+    return () => { controls.stop(); unsubscribe(); };
+  }, [target]);
+
+  return display;
+}
+
+// ─── Floating particles background ───
+function AnimatedBackground() {
   return (
-    <section ref={containerRef} className="relative min-h-[100svh] flex items-center pt-20 pb-12 md:pt-0 md:pb-0">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60%] h-full bg-gradient-to-l from-primary/[0.04] to-transparent" />
-        <div className="absolute bottom-0 left-0 w-[40%] h-[60%] bg-gradient-to-tr from-accent/[0.03] to-transparent" />
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Gradient orbs */}
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-[100px]"
+        style={{ background: "var(--color-primary)", top: "-10%", left: "-10%" }}
+        animate={{ x: [0, 100, 50, 0], y: [0, 50, 100, 0], scale: [1, 1.2, 0.9, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-[100px]"
+        style={{ background: "var(--color-accent)", bottom: "-10%", right: "-5%" }}
+        animate={{ x: [0, -80, -30, 0], y: [0, -60, -120, 0], scale: [1, 0.8, 1.1, 1] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute w-[300px] h-[300px] rounded-full opacity-15 blur-[80px]"
+        style={{ background: "var(--color-secondary)", top: "40%", right: "20%" }}
+        animate={{ x: [0, 60, -40, 0], y: [0, -40, 60, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Floating geometric shapes */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full bg-primary/30"
+          style={{ top: `${15 + i * 15}%`, left: `${10 + i * 16}%` }}
+          animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.4 }}
+        />
+      ))}
+
+      {/* Grid pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, var(--color-text) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+    </div>
+  );
+}
+
+// ─── Animated text reveal ───
+function AnimatedHeadline({ text }: { text: string }) {
+  const words = text.split(" ");
+  return (
+    <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight">
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 50, rotateX: -90 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="inline-block mr-[0.3em]"
+        >
+          <span className="gradient-text">{word}</span>
+        </motion.span>
+      ))}
+    </h1>
+  );
+}
+
+// ─── Layout: Default (animated orbs + text reveal) ───
+function HeroDefault() {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      <AnimatedBackground />
+      <div className="container-custom relative z-10 text-center px-4 pt-20">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, type: "spring" }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
+          >
+            <Sparkles size={14} className="text-primary" />
+            <span className="text-sm font-medium text-primary">{businessData.category}</span>
+          </motion.div>
+
+          <AnimatedHeadline text={aiContent.tagline} />
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto mb-10 mt-6"
+          >
+            {aiContent.heroDescription}
+          </motion.p>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.5 }}>
+            <CTAButtons />
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}>
+            <RatingBadge className="mt-10" />
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <ArrowDown size={20} className="text-foreground/30" />
+        </motion.div>
       </div>
+    </section>
+  );
+}
 
-      <div className="w-full max-w-7xl mx-auto px-5 md:px-8">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-6 items-center">
-          <div className="lg:col-span-7 space-y-6 md:space-y-8">
+// ─── Layout: Split (left animated text, right animated cards) ───
+function HeroSplit() {
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      <AnimatedBackground />
+      <div className="container-custom relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center px-4 pt-24">
+        <motion.div initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
+          <motion.span
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="inline-block px-4 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6 overflow-hidden"
+          >
+            {businessData.category}
+          </motion.span>
+
+          <AnimatedHeadline text={aiContent.tagline} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            className="text-lg text-foreground/60 mb-8 max-w-lg mt-6"
+          >
+            {aiContent.heroDescription}
+          </motion.p>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+            <CTAButtons />
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
+            <RatingBadge className="mt-8" />
+          </motion.div>
+        </motion.div>
+
+        {/* Right side: animated floating info cards */}
+        <div className="hidden lg:flex flex-col gap-5 relative">
+          {[
+            { icon: <MapPin size={22} />, title: "Visit Us", text: businessData.address, delay: 0.4 },
+            { icon: <Phone size={22} />, title: "Call Us", text: businessData.phone || "Contact us", delay: 0.6 },
+            { icon: <Star size={22} />, title: "Rated", text: businessData.rating ? `${businessData.rating} stars on Google` : "Trusted locally", delay: 0.8 },
+          ].map((card, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-3"
+              key={i}
+              initial={{ opacity: 0, x: 60, rotateY: -15 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0 }}
+              transition={{ delay: card.delay, duration: 0.7, ease: "easeOut" }}
+              whileHover={{ scale: 1.02, x: -5 }}
+              className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border shadow-lg flex items-start gap-4"
             >
-              {businessData.rating && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-xs font-medium">
-                  <Star size={12} className="text-yellow-500 fill-yellow-500" />
-                  <span>{businessData.rating}</span>
-                  <span className="text-foreground/40">({businessData.reviewsCount})</span>
-                </div>
-              )}
-              <span className="px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-xs font-medium text-primary">
-                {businessData.category}
-              </span>
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">{card.icon}</div>
+              <div>
+                <h3 className="font-semibold text-sm mb-1">{card.title}</h3>
+                <p className="text-foreground/60 text-sm">{card.text}</p>
+              </div>
             </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-[2.25rem] leading-[1.1] md:text-5xl lg:text-6xl font-heading font-bold tracking-tight"
-            >
-              {aiContent.tagline}
-            </motion.h1>
+// ─── Layout: Typography-focused (massive text + kinetic animation) ───
+function HeroTypography() {
+  return (
+    <section className="relative min-h-screen flex items-end pb-20 overflow-hidden bg-background">
+      <AnimatedBackground />
 
+      {/* Animated lines */}
+      <motion.div
+        className="absolute top-1/3 left-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent w-full"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.5, duration: 1.5 }}
+      />
+      <motion.div
+        className="absolute top-2/3 left-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent w-full"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.8, duration: 1.5 }}
+      />
+
+      <div className="container-custom relative z-10 px-4 w-full">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          <motion.p
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-primary font-mono text-sm mb-6 tracking-wider uppercase flex items-center gap-2"
+          >
+            <motion.span className="inline-block w-8 h-px bg-primary" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4, duration: 0.5 }} />
+            {businessData.category}
+          </motion.p>
+
+          <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-heading font-bold leading-none tracking-tight mb-8">
+            {aiContent.tagline.split(" ").map((word: string, i: number) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 80 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.12, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="inline-block mr-[0.25em]"
+              >
+                {i === 0 ? <span className="gradient-text">{word}</span> : word}
+              </motion.span>
+            ))}
+          </h1>
+
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-base md:text-lg text-foreground/60 max-w-lg leading-relaxed"
+              transition={{ delay: 1 }}
+              className="max-w-md text-foreground/50 text-lg"
             >
               {aiContent.heroDescription}
             </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-3 pt-2"
-            >
-              <a href="#contact" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all active:scale-[0.97]">
-                {aiContent.ctaButtonText || "Get Started"}
-                <ArrowRight size={15} />
-              </a>
-              {businessData.phone && (
-                <a href={`tel:${businessData.phone.replace(/[^+\d]/g, "")}`} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-border rounded-xl font-semibold text-sm hover:bg-card transition-all active:scale-[0.97]">
-                  <Phone size={14} />
-                  {businessData.phone}
-                </a>
-              )}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
+              <CTAButtons />
             </motion.div>
           </div>
 
-          <motion.div style={{ y }} className="lg:col-span-5 hidden lg:block">
-            <div className="relative">
-              {businessData.images[0] ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.7, delay: 0.2 }}
-                  className="rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl shadow-black/10"
-                >
-                  <img src={businessData.images[0]} alt={businessData.name} className="w-full h-full object-cover" />
-                </motion.div>
-              ) : (
-                <div className="space-y-4">
-                  <InfoCard icon={<MapPin size={18} />} label="Location" value={businessData.address || ""} delay={0.3} />
-                  {businessData.phone && <InfoCard icon={<Phone size={18} />} label="Call us" value={businessData.phone} delay={0.4} />}
-                  {businessData.rating && <InfoCard icon={<Star size={18} />} label="Rating" value={`${businessData.rating} stars`} delay={0.5} />}
-                </div>
-              )}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}>
+            <RatingBadge className="mt-10" />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-              {businessData.rating && businessData.images[0] && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="absolute -left-6 bottom-8 bg-background border border-border rounded-xl p-3 shadow-lg"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="flex -space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={11} className={i < Math.round(parseFloat(businessData.rating)) ? "text-yellow-500 fill-yellow-500" : "text-foreground/15"} />
-                      ))}
-                    </div>
-                    <span className="text-xs font-bold">{businessData.rating}</span>
-                  </div>
-                  <p className="text-[10px] text-foreground/50 mt-0.5">{businessData.reviewsCount} reviews</p>
-                </motion.div>
-              )}
-            </div>
+// ─── Layout: Bold (stats + strong lines) ───
+function HeroBold() {
+  const rating = parseFloat(businessData.rating) || 0;
+  const reviews = parseInt(businessData.reviewsCount) || 0;
+  const animatedRating = useAnimatedCounter(rating * 10, 2);
+  const animatedReviews = useAnimatedCounter(reviews, 2.5);
+
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      <AnimatedBackground />
+
+      {/* Animated top accent line */}
+      <motion.div
+        className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-accent"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+      />
+
+      <div className="container-custom relative z-10 px-4 grid lg:grid-cols-12 gap-8 items-center">
+        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="lg:col-span-8">
+          <motion.div
+            className="flex items-center gap-4 mb-8"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.div
+              className="w-3 h-3 bg-primary rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-foreground/60 uppercase tracking-widest text-xs">{businessData.category}</span>
+          </motion.div>
+
+          <AnimatedHeadline text={aiContent.tagline} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="text-xl text-foreground/40 font-light italic mb-8 mt-4"
+          >
+            {aiContent.heroDescription}
+          </motion.p>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+            <a href="#contact" className="inline-block px-10 py-5 bg-primary text-white font-bold text-lg uppercase tracking-wide hover:opacity-90 transition-all hover:shadow-2xl hover:shadow-primary/20 rounded-lg">
+              {aiContent.ctaButtonText || "Contact Now"}
+            </a>
+          </motion.div>
+        </motion.div>
+
+        {/* Animated stats */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          {businessData.rating && (
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="border-l-2 border-primary pl-6"
+            >
+              <div className="text-5xl font-heading font-bold">{(animatedRating / 10).toFixed(1)}</div>
+              <div className="text-foreground/40 text-sm mt-1">Google Rating</div>
+            </motion.div>
+          )}
+          {businessData.reviewsCount && (
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="border-l-2 border-secondary pl-6"
+            >
+              <div className="text-5xl font-heading font-bold">{animatedReviews}+</div>
+              <div className="text-foreground/40 text-sm mt-1">Happy Customers</div>
+            </motion.div>
+          )}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.6 }}
+            className="border-l-2 border-accent pl-6"
+          >
+            <div className="text-5xl font-heading font-bold">24/7</div>
+            <div className="text-foreground/40 text-sm mt-1">Support</div>
           </motion.div>
         </div>
       </div>
@@ -129,45 +375,120 @@ function HeroAsymmetric() {
   );
 }
 
-function HeroEditorial() {
+// ─── Layout: Diagonal (asymmetric with animated shapes) ───
+function HeroDiagonal() {
   return (
-    <section className="relative min-h-[100svh] flex flex-col justify-end pb-16 md:pb-20 pt-24">
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          className="absolute top-[20%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.07] blur-[80px] bg-primary"
-          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-[20%] right-[10%] w-[250px] h-[250px] rounded-full opacity-[0.05] blur-[80px] bg-accent"
-          animate={{ scale: [1, 0.9, 1], y: [0, -20, 0] }}
-          transition={{ duration: 12, repeat: Infinity }}
-        />
-      </div>
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      <AnimatedBackground />
 
-      <div className="w-full max-w-7xl mx-auto px-5 md:px-8 relative">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="mb-6 md:mb-8">
-          <div className="flex items-center gap-3 text-sm text-foreground/50">
-            <span className="w-8 h-px bg-primary" />
-            <span className="uppercase tracking-widest text-xs font-medium text-primary">{businessData.category}</span>
+      <motion.div
+        className="absolute -top-20 -right-20 w-[600px] h-[600px] rounded-full border border-primary/10"
+        initial={{ scale: 0, rotate: 0 }}
+        animate={{ scale: 1, rotate: 360 }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full border border-accent/10"
+        initial={{ scale: 0, rotate: 0 }}
+        animate={{ scale: 1, rotate: -360 }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="container-custom relative z-10 px-4 pt-24">
+        <div className="grid lg:grid-cols-5 gap-12 items-center">
+          <div className="lg:col-span-3">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6"
+            >
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">{businessData.category}</span>
+            </motion.div>
+
+            <AnimatedHeadline text={aiContent.tagline} />
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+              className="text-lg text-foreground/60 max-w-lg mt-6 mb-8"
+            >
+              {aiContent.heroDescription}
+            </motion.p>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+              <CTAButtons />
+            </motion.div>
           </div>
+
+          <div className="lg:col-span-2 hidden lg:flex flex-col items-center justify-center gap-4">
+            {[
+              { label: businessData.rating ? `${businessData.rating} Rated` : "Premium", icon: "star" },
+              { label: businessData.phone || "Always Available", icon: "phone" },
+              { label: businessData.address?.split(",")[0] || "Local", icon: "pin" },
+            ].map((badge, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ delay: 0.5 + i * 0.2, type: "spring", stiffness: 200 }}
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                className="px-6 py-4 rounded-2xl bg-card/80 backdrop-blur-sm border border-border shadow-lg text-center w-full max-w-[240px]"
+              >
+                <p className="font-semibold text-sm">{badge.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
+          <RatingBadge className="mt-12" />
         </motion.div>
+      </div>
+    </section>
+  );
+}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl xl:text-8xl font-heading font-bold tracking-tight max-w-5xl"
+// ─── Layout: Particles (floating interactive elements) ───
+function HeroParticles() {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      <AnimatedBackground />
+
+      {[200, 350, 500].map((size, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border border-primary/5"
+          style={{ width: size, height: size, top: "50%", left: "50%", marginTop: -size / 2, marginLeft: -size / 2 }}
+          animate={{ rotate: 360, scale: [1, 1.05, 1] }}
+          transition={{ duration: 20 + i * 5, repeat: Infinity, ease: "linear" }}
+        />
+      ))}
+
+      <div className="container-custom relative z-10 text-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, type: "spring" }}
         >
-          {aiContent.tagline}
-        </motion.h1>
-
-        <div className="mt-8 md:mt-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-base md:text-lg text-foreground/55 max-w-md leading-relaxed"
+            transition={{ delay: 0.3 }}
+            className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl text-white font-bold shadow-2xl shadow-primary/30"
+          >
+            {businessData.name?.charAt(0)}
+          </motion.div>
+
+          <AnimatedHeadline text={aiContent.tagline} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="text-foreground/60 max-w-2xl mx-auto mb-10 text-lg mt-6"
           >
             {aiContent.heroDescription}
           </motion.p>
@@ -175,147 +496,138 @@ function HeroEditorial() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-3"
+            transition={{ delay: 1.1 }}
+            className="flex flex-wrap items-center justify-center gap-4"
           >
-            <a href="#contact" className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all active:scale-[0.97]">
-              {aiContent.ctaButtonText || "Get Started"}
-              <ArrowRight size={15} />
+            <a href="#contact" className="px-8 py-4 rounded-2xl bg-primary text-white font-semibold hover:shadow-2xl hover:shadow-primary/25 transition-all hover:scale-105">
+              {aiContent.ctaButtonText || "Explore"}
             </a>
             {businessData.phone && (
-              <a href={`tel:${businessData.phone.replace(/[^+\d]/g, "")}`} className="inline-flex items-center justify-center gap-2 px-7 py-4 border border-border rounded-xl font-semibold text-sm hover:bg-card transition-all active:scale-[0.97]">
-                <Phone size={14} />
+              <a href={`tel:${businessData.phone.replace(/[^+\d]/g, "")}`} className="px-8 py-4 rounded-2xl border border-border font-semibold hover:bg-card transition-all hover:scale-105">
                 Call Now
               </a>
             )}
           </motion.div>
-        </div>
 
-        {businessData.rating && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-10 md:mt-14 flex items-center gap-4 pt-6 border-t border-border/50"
-          >
-            <div className="flex -space-x-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={14} className={i < Math.round(parseFloat(businessData.rating)) ? "text-yellow-500 fill-yellow-500" : "text-foreground/15"} />
-              ))}
-            </div>
-            <span className="text-sm font-semibold">{businessData.rating}</span>
-            <span className="text-xs text-foreground/40">{businessData.reviewsCount} reviews on Google</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
+            <RatingBadge className="mt-10" />
           </motion.div>
-        )}
+        </motion.div>
       </div>
-
-      <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2"
-        animate={{ y: [0, 6, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity }}
-      >
-        <ChevronDown size={18} className="text-foreground/25" />
-      </motion.div>
     </section>
   );
 }
 
-function HeroImmersive() {
-  const hasImage = businessData.images.length > 0;
-
+// ─── Layout: Cinematic (dark premium, no image) ───
+function HeroCinematic() {
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center pt-20 pb-12 md:pt-0 md:pb-0">
-      {hasImage && (
-        <div className="absolute inset-0">
-          <img src={businessData.images[0]} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40" />
-        </div>
-      )}
-
-      {!hasImage && (
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-accent/5" />
-          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, var(--color-text) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-        </div>
-      )}
-
-      <div className="relative w-full max-w-4xl mx-auto px-5 md:px-8 text-center">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            {businessData.category}
-          </span>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="text-[2.25rem] leading-[1.1] md:text-5xl lg:text-6xl font-heading font-bold tracking-tight"
-        >
-          {aiContent.tagline}
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-5 md:mt-6 text-base md:text-lg text-foreground/60 max-w-xl mx-auto leading-relaxed"
-        >
-          {aiContent.heroDescription}
-        </motion.p>
-
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      <div className="absolute inset-0">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
-        >
-          <a href="#contact" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all active:scale-[0.97]">
-            {aiContent.ctaButtonText || "Get Started"}
-            <ArrowRight size={15} />
-          </a>
-          <a href="#services" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 bg-background/80 backdrop-blur-sm border border-border rounded-xl font-semibold text-sm hover:bg-card transition-all active:scale-[0.97]">
-            View Services
-          </a>
-        </motion.div>
+          className="absolute inset-0 opacity-40"
+          style={{ background: "radial-gradient(ellipse at 30% 50%, var(--color-primary), transparent 60%)" }}
+          animate={{ opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute inset-0 opacity-30"
+          style={{ background: "radial-gradient(ellipse at 70% 50%, var(--color-accent), transparent 60%)" }}
+          animate={{ opacity: [0.3, 0.15, 0.3] }}
+          transition={{ duration: 7, repeat: Infinity }}
+        />
+      </div>
 
-        {businessData.rating && (
+      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(var(--color-text) 1px, transparent 1px), linear-gradient(90deg, var(--color-text) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+
+      <AnimatedBackground />
+
+      <div className="container-custom relative z-10 text-center px-4">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }}>
           <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-3xl text-white font-bold shadow-2xl shadow-primary/30"
+          >
+            {businessData.name?.charAt(0)}
+          </motion.div>
+
+          <AnimatedHeadline text={aiContent.tagline} />
+
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-border"
+            transition={{ delay: 0.9 }}
+            className="text-foreground/60 max-w-2xl mx-auto mb-10 text-lg mt-6"
           >
-            <div className="flex -space-x-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={12} className={i < Math.round(parseFloat(businessData.rating)) ? "text-yellow-500 fill-yellow-500" : "text-foreground/15"} />
-              ))}
-            </div>
-            <span className="text-xs font-bold">{businessData.rating}</span>
-            <span className="text-[11px] text-foreground/40">({businessData.reviewsCount})</span>
+            {aiContent.heroDescription}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="flex flex-wrap items-center justify-center gap-4"
+          >
+            <a href="#contact" className="px-8 py-4 rounded-2xl bg-primary/10 backdrop-blur-xl border border-primary/20 text-primary font-semibold hover:bg-primary hover:text-white transition-all duration-300">
+              {aiContent.ctaButtonText || "Explore"}
+            </a>
+            {businessData.phone && (
+              <a href={`tel:${businessData.phone.replace(/[^+\d]/g, "")}`} className="px-8 py-4 rounded-2xl bg-primary text-white font-semibold hover:opacity-90 transition-all hover:shadow-xl hover:shadow-primary/20">
+                Call Now
+              </a>
+            )}
           </motion.div>
-        )}
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
+            <RatingBadge className="mt-10" />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function InfoCard({ icon, label, value, delay }: { icon: React.ReactNode; label: string; value: string; delay: number }) {
+// ─── Shared Sub-components ───
+function RatingBadge({ className = "" }: { className?: string }) {
+  if (!businessData.rating) return null;
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.5 }}
-      className="p-5 rounded-xl bg-card border border-border"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.5 }}
+      className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-card border border-border shadow-sm ${className}`}
     >
-      <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{icon}</div>
-        <div className="min-w-0">
-          <p className="text-[11px] text-foreground/45 uppercase tracking-wider font-medium">{label}</p>
-          <p className="text-sm font-medium mt-0.5 truncate">{value}</p>
-        </div>
+      <div className="flex gap-0.5">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} size={14} className={i < Math.round(parseFloat(businessData.rating)) ? "text-yellow-500 fill-yellow-500" : "text-foreground/20"} />
+        ))}
       </div>
+      <span className="font-bold text-sm">{businessData.rating}</span>
+      {businessData.reviewsCount && <span className="text-foreground/50 text-xs">({businessData.reviewsCount} reviews)</span>}
     </motion.div>
+  );
+}
+
+function CTAButtons() {
+  return (
+    <div className="flex flex-col sm:flex-row items-center gap-4">
+      <motion.a
+        href="#contact"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+        className="px-8 py-4 bg-primary text-white rounded-full font-semibold text-lg transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
+      >
+        {aiContent.ctaButtonText || "Get Started"}
+      </motion.a>
+      <motion.a
+        href="#services"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+        className="px-8 py-4 rounded-full border border-border font-semibold text-lg hover:bg-card transition-all"
+      >
+        Our Services
+      </motion.a>
+    </div>
   );
 }
