@@ -6,51 +6,51 @@ export const businessData = {
   phone: "\n098255 55821",
   email: "",
   website: "",
-  mapUrl: "https://www.google.com/maps/place/Gift+'O'+Infinity/@23.0522664,72.5576386,17z/data=!3m1!4b1!4m6!3m5!1s0x395e8484e0bd44b1:0xf1391b894ddaa2ef!8m2!3d23.0522664!4d72.5576386!16s%2Fg%2F11bymwnnr4?entry=ttu&g_ep=EgoyMDI2MDUyNi4wIKXMDSoASAFQAw%3D%3D",
+  mapUrl: "https://www.google.com/maps/place/Gift+'O'+Infinity/@23.0522664,72.5576386,17z/data=!3m1!4b1!4m6!3m5!1s0x395e8484e0bd44b1:0xf1391b894ddaa2ef!8m2!3d23.0522664!4d72.5576386!16s%2Fg%2F11bymwnnr4?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D",
   latitude: "23.0522664",
   longitude: "72.5576386",
   rating: "",
   reviewsCount: "256",
   openingHours: "Show open hours for the week",
   logo: null,
-  images: ["/images/gmap_1780055782931_0.jpg", "/images/gmap_1780055782973_1.jpg", "/images/gmap_1780055783001_2.jpg", "/images/gmap_1780055783022_3.jpg", "/images/gmap_1780055783048_4.jpg", "/images/gmap_1780055783070_5.jpg", "/images/gmap_1780055783096_6.jpg", "/images/gmap_1780055783123_7.jpg", "/images/gmap_1780055783154_8.jpg", "/images/gmap_1780055783183_9.jpg", "/images/gmap_1780055783201_10.jpg"],
+  images: ["/images/gmap_1780056752424_0.jpg", "/images/gmap_1780056752461_1.jpg", "/images/gmap_1780056752500_2.jpg", "/images/gmap_1780056752522_3.jpg", "/images/gmap_1780056752544_4.jpg", "/images/gmap_1780056752566_5.jpg", "/images/gmap_1780056752589_6.jpg", "/images/gmap_1780056752610_7.jpg", "/images/gmap_1780056752636_8.jpg", "/images/gmap_1780056752655_9.jpg", "/images/gmap_1780056752672_10.jpg"],
   description: "",
   socials: {},
 };
 
 export const aiContent = {
-  tagline: "Gifts near Naranpura",
-  heroDescription: "Discover the perfect gift at Gift 'O' Infinity, located in the heart of Ahmedabad, near Naranpura. Our unique gifts will make your loved ones feel special. From thoughtful presents to memorable experiences, we have it all.",
-  aboutTitle: "Our Story Unfolds",
-  aboutText: "Located in the vibrant area of Naranpura, near the post office, Gift 'O' Infinity is a treasure trove of gifts that will leave you and your loved ones spellbound. Our store is nestled in the Anupam Society, opposite Archana High School, making it easily accessible from all parts of the city. We take pride in offering an exquisite range of gifts that cater to all tastes and preferences.",
+  tagline: "Gifts near Naranpura, Endless Delight",
+  heroDescription: "Discover the perfect gift for your loved ones at Gift 'O' Infinity, located in the heart of Ahmedabad, near Naranpura. Our gift shop offers a wide range of unique and thoughtful presents. Visit us today and explore our collection!",
+  aboutTitle: "The Gift of Infinity",
+  aboutText: "Located in the vibrant area of Naranpura, near the post office, Gift 'O' Infinity is a treasure trove of gifts for every occasion. Our shop is nestled in the Anupam Society, opposite Archana High School, making it easily accessible for our customers. We take pride in offering a curated selection of gifts that cater to diverse tastes and preferences.",
   services: [
-    { icon: "🎁", title: "Personalized Gifts", description: "Get customized gifts starting from ₹792, with options to personalize with names, photos, and messages." },
-    { icon: "💎", title: "Jewelry Gifts", description: "Explore our stunning collection of jewelry gifts, priced between ₹1,200 and ₹2,333, featuring intricate designs and precious stones." },
-    { icon: "📚", title: "Book Gifts", description: "Discover our curated selection of books, starting from ₹499, covering various genres and authors, perfect for book lovers." },
-    { icon: "🎨", title: "Artisanal Gifts", description: "Find unique, handmade gifts crafted by local artisans, priced between ₹999 and ₹1,999, showcasing the rich cultural heritage of Ahmedabad." },
-    { icon: "👧", title: "Kids' Gifts", description: "Browse our colorful range of kids' gifts, starting from ₹499, featuring toys, puzzles, and educational games that promote learning and fun." },
-    { icon: "📸", title: "Photography Gifts", description: "Transform your memories into beautiful gifts, starting from ₹1,200, with our personalized photo albums, frames, and canvas prints." }
+    { icon: "🎁", title: "Personalized Gift Wrapping", description: "Our expert team will beautifully wrap your gifts, making them even more special, starting from ₹424" },
+    { icon: "📦", title: "Gift Delivery in Ahmedabad", description: "We offer timely and reliable gift delivery services within Ahmedabad, ensuring your loved ones receive their gifts on time, priced at ₹819" },
+    { icon: "🎉", title: "Birthday Gift Collections", description: "Explore our exclusive range of birthday gifts, carefully curated to make your loved one's special day even more memorable, with prices starting from ₹1098" },
+    { icon: "💕", title: "Anniversary Gift Ideas", description: "Find the perfect gift to celebrate your love and commitment, with our thoughtfully selected anniversary gift collection, priced between ₹1375 and ₹2193" },
+    { icon: "👫", title: "Customized Gift Baskets", description: "Let us help you create a unique and personalized gift basket, tailored to your specific needs and budget, starting from ₹964" },
+    { icon: "📸", title: "Gift Photography", description: "Our team will beautifully capture the moments when you give or receive a gift, creating lasting memories, priced at ₹1572" }
   ],
   whyChooseUs: [
-    { icon: "📍", title: "Convenient Location", description: "Our store is strategically located near Naranpura, making it easily accessible by public transport or on foot." },
-    { icon: "🎁", title: "Wide Gift Selection", description: "We offer an extensive range of gifts to suit all occasions and preferences, ensuring you find the perfect present for your loved ones." },
-    { icon: "👥", title: "Personalized Service", description: "Our friendly and knowledgeable staff are always happy to assist you in finding the ideal gift, providing a personalized shopping experience." }
+    { icon: "📍", title: "Strategic Location", description: "Our gift shop is conveniently located near Naranpura, making it easily accessible for customers from all over Ahmedabad" },
+    { icon: "🎁", title: "Unique Gift Selection", description: "We offer a wide range of exclusive and thoughtful gifts that cater to diverse tastes and preferences" },
+    { icon: "📦", title: "Reliable Delivery Services", description: "We provide timely and reliable gift delivery services within Ahmedabad, ensuring your loved ones receive their gifts on time" }
   ],
   testimonials: [
-    { name: "Yashvi Mehta", role: "Regular Customer", text: "I recently purchased a personalized photo album from Gift 'O' Infinity, and I was thrilled with the quality and service. The staff helped me choose the perfect gift for my sister's birthday.", rating: 5 },
-    { name: "Yogesh Patel", role: "Corporate Client", text: "We ordered customized gifts for our employees from Gift 'O' Infinity, and the team did an excellent job in delivering high-quality products on time. Their attention to detail is impressive.", rating: 5 },
-    { name: "Yuvika Shah", role: "First-Time Customer", text: "I stumbled upon Gift 'O' Infinity while exploring the area near Naranpura, and I was delighted to discover their unique collection of artisanal gifts. The prices are reasonable, and the staff is very helpful.", rating: 5 }
+    { name: "Lakshmi Jain", role: "Regular Customer", text: "I recently purchased a beautiful gift basket from Gift 'O' Infinity, and their customized gift wrapping service exceeded my expectations. The team is very helpful and courteous.", rating: 5 },
+    { name: "Leela Mehta", role: "First-Time Customer", text: "I stumbled upon Gift 'O' Infinity while exploring the Naranpura area, and I was impressed by their unique gift collection. The prices are very reasonable, and the service is excellent.", rating: 5 },
+    { name: "Lalit Shah", role: "Corporate Client", text: "We have been using Gift 'O' Infinity's gift delivery services for our corporate events, and they have always delivered on time. Their gift selection is impressive, and the team is very professional.", rating: 5 }
   ],
-  faq: { items: [{ question: "What are your store timings?", answer: "Our store is open from 10:00 AM to 8:00 PM, Monday to Sunday. You can visit us at our location near the post office in Naranpura, Ahmedabad." },
-    { question: "Do you offer gift wrapping services?", answer: "Yes, we provide complimentary gift wrapping services for all purchases made at our store. Our team will beautifully wrap your gift, making it ready to be presented to your loved ones." },
-    { question: "Can I customize my gift?", answer: "Yes, we offer customization options for many of our gifts. Please contact our team to discuss your requirements, and we will be happy to assist you in creating a personalized present." },
-    { question: "What is your return and exchange policy?", answer: "We have a 7-day return and exchange policy. If you are not satisfied with your purchase, please contact us within 7 days, and we will be happy to assist you with a return or exchange, subject to certain conditions." },
-    { question: "Do you offer online payment options?", answer: "Yes, we accept online payments through various modes, including credit/debit cards, net banking, and mobile wallets. You can also pay by cash or card at our store." },
-    { question: "How do I track my order?", answer: "Once your order is shipped, you will receive a tracking number via email and SMS. You can use this number to track the status of your order on our website or through the courier company's website." }] },
-  ctaTitle: "Find Your Perfect Gift",
-  ctaDescription: "Explore our wide range of gifts and find the perfect present for your loved ones. Visit us today and experience the Gift 'O' Infinity difference.",
+  faq: { items: [{ question: "What are your business hours?", answer: "Our gift shop is open from 10 am to 8 pm, Monday to Sunday. You can visit us at post office, Gift o shop no 1 anupam society opp archana high school, cross road, near Naranpura, Naranpura, Ahmedabad, Gujarat 380013" },
+    { question: "Do you offer gift wrapping services?", answer: "Yes, we offer personalized gift wrapping services, starting from ₹424. Our team will beautifully wrap your gifts, making them even more special" },
+    { question: "Can I get my gifts delivered?", answer: "Yes, we offer timely and reliable gift delivery services within Ahmedabad, priced at ₹819. Please contact us to know more about our delivery services" },
+    { question: "How can I contact Gift 'O' Infinity?", answer: "You can contact us at 📞 098255 55821 or visit our shop at post office, Gift o shop no 1 anupam society opp archana high school, cross road, near Naranpura, Naranpura, Ahmedabad, Gujarat 380013" },
+    { question: "Do you have any discounts or promotions?", answer: "Yes, we occasionally offer discounts and promotions on our gifts. Please follow us on social media or visit our shop to know more about our current offers" },
+    { question: "Can I customize my gift basket?", answer: "Yes, we offer customized gift baskets, starting from ₹964. Our team will help you create a unique and personalized gift basket, tailored to your specific needs and budget" }] },
+  ctaTitle: "Find the Perfect Gift",
+  ctaDescription: "Explore our exclusive range of gifts and make your loved ones feel special. Visit us today or contact us to know more.",
   ctaButtonText: "Explore Gifts",
-  metaDescription: "Gift 'O' Infinity, a gift shop near Naranpura, offers unique gifts for all occasions. Visit us today and discover the perfect present.",
+  metaDescription: "Gift 'O' Infinity, a gift shop near Naranpura, offers unique gifts and personalized services",
 };
 
 export const siteConfig = {
